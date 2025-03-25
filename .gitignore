@@ -9,7 +9,7 @@ node_modules/
 .env.production.local
 
 # Build output (commented because we need it for npm package)
-# build/
+build/
 
 # Logs
 logs
