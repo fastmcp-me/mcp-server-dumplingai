@@ -68,11 +68,31 @@ const server = new McpServer({
 // Tool to fetch YouTube transcript from the Dumpling AI API
 server.tool(
   "get-youtube-transcript",
+  "Extract transcripts from YouTube videos with optional parameters for timestamps and language preferences. Provides both the transcript text and detected language.",
   {
-    videoUrl: z.string().url(),
-    includeTimestamps: z.boolean().optional(),
-    timestampsToCombine: z.number().optional(),
-    preferredLanguage: z.string().optional(),
+    videoUrl: z
+      .string()
+      .url()
+      .describe("URL of the YouTube video to extract the transcript from"),
+    includeTimestamps: z
+      .boolean()
+      .optional()
+      .default(true)
+      .describe("Whether to include timestamps in the transcript output"),
+    timestampsToCombine: z
+      .number()
+      .optional()
+      .default(1)
+      .describe(
+        "Number of transcript chunks to combine into a single timestamp"
+      ),
+    preferredLanguage: z
+      .string()
+      .optional()
+      .default("en")
+      .describe(
+        "Preferred language code for the transcript (e.g., 'en', 'es', 'fr')"
+      ),
   },
   async ({
     videoUrl,
@@ -130,11 +150,21 @@ server.tool(
 // Tool to perform Google web search and optionally scrape content from results
 server.tool(
   "search",
+  "Perform Google web searches with customizable parameters. Can optionally scrape and extract content from search results to provide more detailed information beyond snippets.",
   {
-    query: z.string(),
-    country: z.string().optional(),
-    location: z.string().optional(),
-    language: z.string().optional(),
+    query: z.string().describe("Search query to perform on Google"),
+    country: z
+      .string()
+      .optional()
+      .describe("Country code for localized search results (e.g., 'us', 'uk')"),
+    location: z
+      .string()
+      .optional()
+      .describe("Location name to target search results to a specific area"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for search results (e.g., 'en', 'es')"),
     dateRange: z
       .enum([
         "anyTime",
@@ -144,16 +174,24 @@ server.tool(
         "pastMonth",
         "pastYear",
       ])
-      .optional(),
-    page: z.number().optional(),
-    scrapeResults: z.boolean().optional(),
-    numResultsToScrape: z.number().optional(),
+      .optional()
+      .describe("Time range filter for search results"),
+    page: z.number().optional().describe("Page number for paginated results"),
+    scrapeResults: z
+      .boolean()
+      .optional()
+      .describe("Whether to extract content from search result pages"),
+    numResultsToScrape: z
+      .number()
+      .optional()
+      .describe("Number of search results to scrape content from"),
     scrapeOptions: z
       .object({
         format: z.enum(["markdown", "html", "screenshot"]).optional(),
         cleaned: z.boolean().optional(),
       })
-      .optional(),
+      .optional()
+      .describe("Options for scraping content from search results"),
   },
   async ({
     query,
@@ -234,11 +272,23 @@ server.tool(
 // Tool to get Google search autocomplete suggestions
 server.tool(
   "get-autocomplete",
+  "Retrieve Google search autocomplete suggestions for a given query. Helps to discover related search terms and common queries related to a topic.",
   {
-    query: z.string(),
-    location: z.string().optional(),
-    country: z.string().optional(),
-    language: z.string().optional(),
+    query: z
+      .string()
+      .describe("Search query to get autocomplete suggestions for"),
+    location: z
+      .string()
+      .optional()
+      .describe("Location name to target suggestions to a specific area"),
+    country: z
+      .string()
+      .optional()
+      .describe("Country code for localized suggestions (e.g., 'us', 'uk')"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for suggestions (e.g., 'en', 'es')"),
   },
   async ({ query, location, country, language }) => {
     // Get API key from environment variable
@@ -296,13 +346,28 @@ server.tool(
 // Tool to perform Google Maps search
 server.tool(
   "search-maps",
+  "Search Google Maps for locations, businesses, and points of interest. Returns geographic coordinates and place details for map-based queries.",
   {
-    query: z.string(),
-    gpsPositionZoom: z.string().optional(),
-    placeId: z.string().optional(),
-    cid: z.string().optional(),
-    language: z.string().optional(),
-    page: z.number().optional(),
+    query: z.string().describe("Search query for Google Maps locations"),
+    gpsPositionZoom: z
+      .string()
+      .optional()
+      .describe(
+        "GPS coordinates with zoom level in format 'latitude,longitude,zoom'"
+      ),
+    placeId: z
+      .string()
+      .optional()
+      .describe("Specific Google Place ID to retrieve details for"),
+    cid: z
+      .string()
+      .optional()
+      .describe("Google Maps CID (Content ID) for specific places"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for results (e.g., 'en', 'es')"),
+    page: z.number().optional().describe("Page number for paginated results"),
   },
   async ({ query, gpsPositionZoom, placeId, cid, language, page }) => {
     // Get API key from environment variable
@@ -363,12 +428,22 @@ server.tool(
 // Tool to perform Google Places search
 server.tool(
   "search-places",
+  "Search for places with detailed business information. Includes more specific data than maps search such as business details, ratings, and categories.",
   {
-    query: z.string(),
-    country: z.string().optional(),
-    location: z.string().optional(),
-    language: z.string().optional(),
-    page: z.number().optional(),
+    query: z.string().describe("Search query for Google Places"),
+    country: z
+      .string()
+      .optional()
+      .describe("Country code for localized results (e.g., 'us', 'uk')"),
+    location: z
+      .string()
+      .optional()
+      .describe("Location name to target search results to a specific area"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for results (e.g., 'en', 'es')"),
+    page: z.number().optional().describe("Page number for paginated results"),
   },
   async ({ query, country, location, language, page }) => {
     // Get API key from environment variable
@@ -427,11 +502,21 @@ server.tool(
 // Tool to perform Google News search
 server.tool(
   "search-news",
+  "Search for news articles across multiple sources with customizable date ranges. Useful for finding recent information, current events, and news coverage on specific topics.",
   {
-    query: z.string(),
-    country: z.string().optional(),
-    location: z.string().optional(),
-    language: z.string().optional(),
+    query: z.string().describe("Search query for news articles"),
+    country: z
+      .string()
+      .optional()
+      .describe("Country code for localized news results (e.g., 'us', 'uk')"),
+    location: z
+      .string()
+      .optional()
+      .describe("Location name to target news to a specific area"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for news results (e.g., 'en', 'es')"),
     dateRange: z
       .enum([
         "anyTime",
@@ -441,8 +526,9 @@ server.tool(
         "pastMonth",
         "pastYear",
       ])
-      .optional(),
-    page: z.number().optional(),
+      .optional()
+      .describe("Time range filter for news results"),
+    page: z.number().optional().describe("Page number for paginated results"),
   },
   async ({ query, country, location, language, dateRange, page }) => {
     // Get API key from environment variable
@@ -502,13 +588,32 @@ server.tool(
 // Tool to fetch Google reviews for a place
 server.tool(
   "get-google-reviews",
+  "Retrieve Google reviews for businesses or places. Fetches rating data, review content, and reviewer information to provide insights on public opinion about a location.",
   {
-    placeId: z.string().optional(),
-    businessName: z.string().optional(),
-    location: z.string().optional(),
-    language: z.string().optional(),
-    limit: z.number().optional(),
-    sortBy: z.enum(["relevance", "newest"]).optional(),
+    placeId: z
+      .string()
+      .optional()
+      .describe("Google Place ID to retrieve reviews for"),
+    businessName: z
+      .string()
+      .optional()
+      .describe("Name of the business to search for reviews"),
+    location: z
+      .string()
+      .optional()
+      .describe("Location to help narrow down business search"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for review content (e.g., 'en', 'es')"),
+    limit: z
+      .number()
+      .optional()
+      .describe("Maximum number of reviews to retrieve"),
+    sortBy: z
+      .enum(["relevance", "newest"])
+      .optional()
+      .describe("Sorting method for reviews"),
   },
   async ({ placeId, businessName, location, language, limit, sortBy }) => {
     // Ensure either placeId or businessName is provided
@@ -569,11 +674,21 @@ server.tool(
 // Tool to scrape content from a URL
 server.tool(
   "scrape",
+  "Extract and parse content from any web page. Can return content in various formats including markdown and HTML, with options to clean and process the data.",
   {
-    url: z.string().url(),
-    format: z.enum(["markdown", "html", "screenshot"]).optional(),
-    cleaned: z.boolean().optional(),
-    renderJs: z.boolean().optional(),
+    url: z.string().url().describe("URL of the web page to scrape"),
+    format: z
+      .enum(["markdown", "html", "screenshot"])
+      .optional()
+      .describe("Output format for the scraped content"),
+    cleaned: z
+      .boolean()
+      .optional()
+      .describe("Whether to clean and simplify the content structure"),
+    renderJs: z
+      .boolean()
+      .optional()
+      .describe("Whether to execute JavaScript on the page before scraping"),
   },
   async ({ url, format, cleaned, renderJs }) => {
     // Get API key from environment variable
@@ -635,20 +750,37 @@ server.tool(
 // Tool to crawl a website and extract content
 server.tool(
   "crawl",
+  "Recursively crawl websites and extract content from multiple pages. Supports depth control, filtering, and various content extraction options for comprehensive site analysis.",
   {
-    baseUrl: z.string().url(),
-    maxPages: z.number().optional(),
-    crawlBeyondBaseUrl: z.boolean().optional(),
-    depth: z.number().optional(),
-    strategy: z.string().optional(),
-    filterRegex: z.string().optional(),
+    baseUrl: z.string().url().describe("Starting URL for the crawl operation"),
+    maxPages: z
+      .number()
+      .optional()
+      .describe("Maximum number of pages to crawl"),
+    crawlBeyondBaseUrl: z
+      .boolean()
+      .optional()
+      .describe("Whether to follow links to external domains"),
+    depth: z
+      .number()
+      .optional()
+      .describe("Maximum depth of pages to crawl from the base URL"),
+    strategy: z
+      .string()
+      .optional()
+      .describe("Crawling strategy (e.g., 'breadth-first', 'depth-first')"),
+    filterRegex: z
+      .string()
+      .optional()
+      .describe("Regular expression pattern to filter URLs"),
     scrapeOptions: z
       .object({
         format: z.enum(["markdown", "html", "screenshot"]).optional(),
         cleaned: z.boolean().optional(),
         renderJs: z.boolean().optional(),
       })
-      .optional(),
+      .optional()
+      .describe("Options for scraping content from crawled pages"),
   },
   async ({
     baseUrl,
@@ -710,16 +842,35 @@ server.tool(
 // Tool to capture a screenshot of a webpage
 server.tool(
   "screenshot",
+  "Capture screenshots of web pages with customizable viewport settings. Supports various formats, quality settings, and options for full-page captures.",
   {
-    url: z.string().url(),
-    width: z.number().optional(),
-    height: z.number().optional(),
-    deviceScaleFactor: z.number().optional(),
-    fullPage: z.boolean().optional(),
-    format: z.enum(["png", "jpeg"]).optional(),
-    quality: z.number().optional(),
-    renderJs: z.boolean().optional(),
-    waitFor: z.number().optional(),
+    url: z.string().url().describe("URL of the web page to capture"),
+    width: z.number().optional().describe("Viewport width in pixels"),
+    height: z.number().optional().describe("Viewport height in pixels"),
+    deviceScaleFactor: z
+      .number()
+      .optional()
+      .describe("Device scale factor for high-DPI screenshots"),
+    fullPage: z
+      .boolean()
+      .optional()
+      .describe("Whether to capture the full scrollable page"),
+    format: z
+      .enum(["png", "jpeg"])
+      .optional()
+      .describe("Image format for the screenshot"),
+    quality: z
+      .number()
+      .optional()
+      .describe("Image quality for JPEG format (1-100)"),
+    renderJs: z
+      .boolean()
+      .optional()
+      .describe("Whether to execute JavaScript on the page before capturing"),
+    waitFor: z
+      .number()
+      .optional()
+      .describe("Time in milliseconds to wait before capturing the screenshot"),
   },
   async ({
     url,
@@ -793,11 +944,22 @@ server.tool(
 // Tool to extract structured data from a webpage
 server.tool(
   "extract",
+  "Extract structured data from web pages using AI-powered instructions. Converts unstructured web content into structured data with customizable schemas.",
   {
-    url: z.string().url(),
-    instructions: z.string(),
-    schema: z.record(z.any()).optional(),
-    renderJs: z.boolean().optional(),
+    url: z.string().url().describe("URL of the web page to extract data from"),
+    instructions: z
+      .string()
+      .describe("Natural language instructions for what data to extract"),
+    schema: z
+      .record(z.any())
+      .optional()
+      .describe(
+        "Optional JSON schema to define the structure of extracted data"
+      ),
+    renderJs: z
+      .boolean()
+      .optional()
+      .describe("Whether to execute JavaScript on the page before extracting"),
   },
   async ({ url, instructions, schema, renderJs }) => {
     // Get API key from environment variable
@@ -848,15 +1010,30 @@ server.tool(
 // Tool to convert documents to text
 server.tool(
   "doc-to-text",
+  "Convert various document formats to plain text with optional OCR for images and scanned documents. Extracts raw text content while preserving basic structure.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
+    url: z
+      .string()
+      .url()
+      .optional()
+      .describe("URL of the document to convert to text"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded document data as an alternative to URL"),
     options: z
       .object({
-        ocr: z.boolean().optional(),
-        language: z.string().optional(),
+        ocr: z
+          .boolean()
+          .optional()
+          .describe("Whether to use OCR for images and scanned documents"),
+        language: z
+          .string()
+          .optional()
+          .describe("Preferred language code for OCR processing"),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for text extraction"),
   },
   async ({ url, base64, options }) => {
     // Ensure either url or base64 is provided
@@ -919,9 +1096,17 @@ server.tool(
 // Tool to convert various file formats to PDF
 server.tool(
   "convert-to-pdf",
+  "Convert various file formats to PDF including documents, slides, spreadsheets, and images. Preserves formatting and layout of the original files.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
+    url: z
+      .string()
+      .url()
+      .optional()
+      .describe("URL of the file to convert to PDF"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded file data as an alternative to URL"),
     format: z
       .enum([
         "docx",
@@ -934,14 +1119,22 @@ server.tool(
         "html",
         "image",
       ])
-      .optional(),
+      .optional()
+      .describe("Original file format to help with the conversion process"),
     options: z
       .object({
-        quality: z.number().optional(),
-        pageSize: z.string().optional(),
-        margin: z.number().optional(),
+        margin: z.number().optional().describe("Margin size in pixels"),
+        pageSize: z
+          .string()
+          .optional()
+          .describe("Page size (e.g., 'A4', 'Letter')"),
+        quality: z
+          .number()
+          .optional()
+          .describe("Output quality for the PDF (1-100)"),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for PDF conversion"),
   },
   async ({ url, base64, format, options }) => {
     // Ensure either url or base64 is provided
@@ -1006,15 +1199,29 @@ server.tool(
 // Tool to combine multiple PDFs into one
 server.tool(
   "merge-pdfs",
+  "Combine multiple PDF files into a single document with optional page numbering and table of contents. Maintains quality and structure of original files.",
   {
-    urls: z.array(z.string().url()).optional(),
-    base64Files: z.array(z.string()).optional(),
+    urls: z
+      .array(z.string())
+      .optional()
+      .describe("Array of URLs pointing to PDF files to merge"),
+    base64Files: z
+      .array(z.string())
+      .optional()
+      .describe("Array of base64-encoded PDF files to merge"),
     options: z
       .object({
-        addPageNumbers: z.boolean().optional(),
-        addTableOfContents: z.boolean().optional(),
+        addPageNumbers: z
+          .boolean()
+          .optional()
+          .describe("Whether to add page numbers to the merged PDF"),
+        addTableOfContents: z
+          .boolean()
+          .optional()
+          .describe("Whether to add a table of contents to the merged PDF"),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for the PDF merging process"),
   },
   async ({ urls, base64Files, options }) => {
     // Ensure either urls or base64Files is provided
@@ -1081,20 +1288,42 @@ server.tool(
 // Tool to trim videos to a specific duration
 server.tool(
   "trim-video",
+  "Trim videos to specific start and end times with customizable output formats. Supports conversion to MP4, WebM, or GIF with quality control options.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    startTime: z.number(),
-    endTime: z.number(),
-    output: z.enum(["mp4", "webm", "gif"]).optional(),
+    url: z.string().url().optional().describe("URL of the video to trim"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded video data as an alternative to URL"),
+    startTime: z
+      .number()
+      .describe("Start time in seconds for the trimmed video"),
+    endTime: z.number().describe("End time in seconds for the trimmed video"),
+    output: z
+      .enum(["mp4", "webm", "gif"])
+      .optional()
+      .describe("Output format for the trimmed video"),
     options: z
       .object({
-        quality: z.number().optional(),
-        width: z.number().optional(),
-        height: z.number().optional(),
-        fps: z.number().optional(),
+        width: z
+          .number()
+          .optional()
+          .describe("Width of the output video in pixels"),
+        height: z
+          .number()
+          .optional()
+          .describe("Height of the output video in pixels"),
+        fps: z
+          .number()
+          .optional()
+          .describe("Frames per second for the output video"),
+        quality: z
+          .number()
+          .optional()
+          .describe("Quality setting for the output video (1-100)"),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for video processing"),
   },
   async ({ url, base64, startTime, endTime, output, options }) => {
     // Ensure either url or base64 is provided
@@ -1163,17 +1392,39 @@ server.tool(
 // Tool to extract content from a document
 server.tool(
   "extract-document",
+  "Extract specific content types from documents including text, tables, forms, and structured data. Supports OCR for images and scanned documents.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    format: z.enum(["text", "structured", "tables", "forms"]),
+    url: z
+      .string()
+      .url()
+      .optional()
+      .describe("URL of the document to extract content from"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded document data as an alternative to URL"),
+    format: z
+      .enum(["text", "structured", "tables", "forms"])
+      .describe("Type of content to extract from the document"),
     options: z
       .object({
-        ocr: z.boolean().optional(),
-        language: z.string().optional(),
-        includeMetadata: z.boolean().optional(),
+        ocr: z
+          .boolean()
+          .optional()
+          .describe("Whether to use OCR for images and scanned documents"),
+        language: z
+          .string()
+          .optional()
+          .describe("Preferred language code for OCR processing"),
+        includeMetadata: z
+          .boolean()
+          .optional()
+          .describe(
+            "Whether to include document metadata in the extraction results"
+          ),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for document extraction"),
   },
   async ({ url, base64, format, options }) => {
     // Ensure either url or base64 is provided
@@ -1229,17 +1480,35 @@ server.tool(
 // Tool to extract text and information from images
 server.tool(
   "extract-image",
+  "Extract text, objects, faces, or color information from images using AI-powered analysis. Provides comprehensive visual content understanding.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    extractionType: z.enum(["text", "objects", "faces", "colors", "all"]),
+    url: z.string().url().optional().describe("URL of the image to analyze"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded image data as an alternative to URL"),
+    extractionType: z
+      .enum(["text", "objects", "faces", "colors", "all"])
+      .describe("Type of information to extract from the image"),
     options: z
       .object({
-        language: z.string().optional(),
-        confidence: z.number().optional(),
-        detectOrientation: z.boolean().optional(),
+        confidence: z
+          .number()
+          .optional()
+          .describe("Minimum confidence threshold for detected elements (0-1)"),
+        language: z
+          .string()
+          .optional()
+          .describe("Language code for OCR text extraction"),
+        detectOrientation: z
+          .boolean()
+          .optional()
+          .describe(
+            "Whether to automatically detect and correct image orientation"
+          ),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for image analysis"),
   },
   async ({ url, base64, extractionType, options }) => {
     // Ensure either url or base64 is provided
@@ -1295,18 +1564,44 @@ server.tool(
 // Tool to extract text from audio files
 server.tool(
   "extract-audio",
+  "Convert speech in audio files to text with optional speaker diarization and word-level timestamps. Supports multiple languages and profanity filtering.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    language: z.string().optional(),
+    url: z
+      .string()
+      .url()
+      .optional()
+      .describe("URL of the audio file to transcribe"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded audio data as an alternative to URL"),
+    language: z
+      .string()
+      .optional()
+      .describe("Language code for the audio content (e.g., 'en-US')"),
     options: z
       .object({
-        model: z.enum(["standard", "enhanced"]).optional(),
-        speakerDiarization: z.boolean().optional(),
-        wordTimestamps: z.boolean().optional(),
-        filterProfanity: z.boolean().optional(),
+        model: z
+          .enum(["standard", "enhanced"])
+          .optional()
+          .describe(
+            "Speech recognition model to use (standard or enhanced quality)"
+          ),
+        speakerDiarization: z
+          .boolean()
+          .optional()
+          .describe("Whether to identify and label different speakers"),
+        wordTimestamps: z
+          .boolean()
+          .optional()
+          .describe("Whether to include timestamps for each word"),
+        filterProfanity: z
+          .boolean()
+          .optional()
+          .describe("Whether to filter out profanity from the transcript"),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for audio transcription"),
   },
   async ({ url, base64, language, options }) => {
     // Ensure either url or base64 is provided
@@ -1371,24 +1666,39 @@ server.tool(
 // Tool to extract information from videos
 server.tool(
   "extract-video",
+  "Extract transcripts, scenes, objects, and summaries from video content. Performs multi-modal analysis for comprehensive video understanding.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    extractionType: z.enum([
-      "transcript",
-      "scenes",
-      "objects",
-      "summary",
-      "all",
-    ]),
+    url: z.string().url().optional().describe("URL of the video to analyze"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded video data as an alternative to URL"),
+    extractionType: z
+      .enum(["transcript", "scenes", "objects", "summary", "all"])
+      .describe("Type of information to extract from the video"),
     options: z
       .object({
-        language: z.string().optional(),
-        timestampInterval: z.number().optional(),
-        confidence: z.number().optional(),
-        speakerDiarization: z.boolean().optional(),
+        language: z
+          .string()
+          .optional()
+          .describe("Language code for transcript extraction"),
+        timestampInterval: z
+          .number()
+          .optional()
+          .describe("Interval in seconds for timestamp markers"),
+        confidence: z
+          .number()
+          .optional()
+          .describe("Minimum confidence threshold for object detection"),
+        speakerDiarization: z
+          .boolean()
+          .optional()
+          .describe(
+            "Whether to identify and label different speakers in transcripts"
+          ),
       })
-      .optional(),
+      .optional()
+      .describe("Additional options for video analysis"),
   },
   async ({ url, base64, extractionType, options }) => {
     // Ensure either url or base64 is provided
@@ -1444,10 +1754,23 @@ server.tool(
 // Tool to read metadata from PDF files
 server.tool(
   "read-pdf-metadata",
+  "Extract metadata from PDF files including title, author, creation date, and other document properties. Provides insights into document origin and characteristics.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    includeExtended: z.boolean().optional(),
+    url: z
+      .string()
+      .url()
+      .optional()
+      .describe("URL of the PDF file to read metadata from"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded PDF data as an alternative to URL"),
+    includeExtended: z
+      .boolean()
+      .optional()
+      .describe(
+        "Whether to include extended metadata properties in the results"
+      ),
   },
   async ({ url, base64, includeExtended }) => {
     // Ensure either url or base64 is provided
@@ -1502,20 +1825,51 @@ server.tool(
 // Tool to write metadata to PDF files
 server.tool(
   "write-pdf-metadata",
+  "Update metadata in PDF files with custom properties including title, author, keywords, and other document attributes. Preserves document content while modifying metadata.",
   {
-    url: z.string().url().optional(),
-    base64: z.string().optional(),
-    metadata: z.object({
-      title: z.string().optional(),
-      author: z.string().optional(),
-      subject: z.string().optional(),
-      keywords: z.array(z.string()).optional(),
-      creator: z.string().optional(),
-      producer: z.string().optional(),
-      creationDate: z.string().optional(),
-      modDate: z.string().optional(),
-      customProperties: z.record(z.string()).optional(),
-    }),
+    url: z
+      .string()
+      .url()
+      .optional()
+      .describe("URL of the PDF file to update metadata for"),
+    base64: z
+      .string()
+      .optional()
+      .describe("Base64-encoded PDF data as an alternative to URL"),
+    metadata: z
+      .object({
+        title: z.string().optional().describe("Title of the document"),
+        author: z.string().optional().describe("Author of the document"),
+        subject: z
+          .string()
+          .optional()
+          .describe("Subject or description of the document"),
+        keywords: z
+          .array(z.string())
+          .optional()
+          .describe("Keywords related to the document content"),
+        creator: z
+          .string()
+          .optional()
+          .describe("Application used to create the original document"),
+        producer: z
+          .string()
+          .optional()
+          .describe("Application used to convert the document to PDF"),
+        creationDate: z
+          .string()
+          .optional()
+          .describe("Date when the document was created (ISO format)"),
+        modDate: z
+          .string()
+          .optional()
+          .describe("Date when the document was last modified (ISO format)"),
+        customProperties: z
+          .record(z.string())
+          .optional()
+          .describe("Custom metadata properties as key-value pairs"),
+      })
+      .describe("Metadata properties to write to the PDF file"),
   },
   async ({ url, base64, metadata }) => {
     // Ensure either url or base64 is provided
@@ -1583,22 +1937,40 @@ server.tool(
 // Tool to get AI agent completions
 server.tool(
   "generate-agent-completion",
+  "Generate AI text completions with customizable models, parameters, and context. Supports function calling capabilities with defined tools for complex task execution.",
   {
-    prompt: z.string(),
-    agentId: z.string().optional(),
-    model: z.string().optional(),
-    temperature: z.number().optional(),
-    maxTokens: z.number().optional(),
+    prompt: z.string().describe("Text prompt for generating the completion"),
+    agentId: z
+      .string()
+      .optional()
+      .describe("Specific agent ID to use for the completion"),
+    model: z.string().optional().describe("AI model to use for the completion"),
+    temperature: z
+      .number()
+      .optional()
+      .describe(
+        "Temperature setting for controlling response randomness (0-1)"
+      ),
+    maxTokens: z
+      .number()
+      .optional()
+      .describe("Maximum number of tokens to generate in the response"),
     tools: z
       .array(
         z.object({
-          name: z.string(),
-          description: z.string(),
-          parameters: z.record(z.any()),
+          name: z.string().describe("Name of the tool"),
+          description: z.string().describe("Description of what the tool does"),
+          parameters: z
+            .record(z.any())
+            .describe("Parameters accepted by the tool"),
         })
       )
-      .optional(),
-    context: z.array(z.string()).optional(),
+      .optional()
+      .describe("Function calling tools to make available to the AI"),
+    context: z
+      .array(z.string())
+      .optional()
+      .describe("Additional context strings to inform the completion"),
   },
   async ({
     prompt,
@@ -1671,12 +2043,24 @@ server.tool(
 // Tool to search a knowledge base
 server.tool(
   "search-knowledge-base",
+  "Search through structured knowledge bases for relevant information with semantic matching. Retrieves context-aware results based on similarity and metadata filters.",
   {
-    kbId: z.string(),
-    query: z.string(),
-    limit: z.number().optional(),
-    metadata: z.record(z.any()).optional(),
-    similarityThreshold: z.number().optional(),
+    kbId: z.string().describe("ID of the knowledge base to search"),
+    query: z
+      .string()
+      .describe("Search query to match against knowledge base content"),
+    limit: z
+      .number()
+      .optional()
+      .describe("Maximum number of results to return"),
+    metadata: z
+      .record(z.any())
+      .optional()
+      .describe("Metadata filters to apply to the search"),
+    similarityThreshold: z
+      .number()
+      .optional()
+      .describe("Minimum similarity score threshold for results (0-1)"),
   },
   async ({ kbId, query, limit, metadata, similarityThreshold }) => {
     // Get API key from environment variable
@@ -1731,15 +2115,24 @@ server.tool(
 // Tool to add entries to a knowledge base
 server.tool(
   "add-to-knowledge-base",
+  "Add new entries to knowledge bases with optional metadata tagging. Supports upsert operations for updating existing entries or adding new content.",
   {
-    kbId: z.string(),
-    entries: z.array(
-      z.object({
-        text: z.string(),
-        metadata: z.record(z.any()).optional(),
-      })
-    ),
-    upsert: z.boolean().optional(),
+    kbId: z.string().describe("ID of the knowledge base to add entries to"),
+    entries: z
+      .array(
+        z.object({
+          text: z.string().describe("Text content of the knowledge base entry"),
+          metadata: z
+            .record(z.any())
+            .optional()
+            .describe("Optional metadata for the entry"),
+        })
+      )
+      .describe("Array of entries to add to the knowledge base"),
+    upsert: z
+      .boolean()
+      .optional()
+      .describe("Whether to update existing entries with matching IDs"),
   },
   async ({ kbId, entries, upsert }) => {
     // Get API key from environment variable
@@ -1792,15 +2185,34 @@ server.tool(
 // Tool to generate AI images
 server.tool(
   "generate-ai-image",
+  "Generate AI images from text prompts with customizable dimensions, quality, and style settings. Creates original images based on detailed text descriptions.",
   {
-    prompt: z.string(),
-    model: z.string().optional(),
-    width: z.number().optional(),
-    height: z.number().optional(),
-    numImages: z.number().optional(),
-    quality: z.enum(["standard", "hd"]).optional(),
-    style: z.string().optional(),
-    negativePrompt: z.string().optional(),
+    prompt: z.string().describe("Text description of the image to generate"),
+    model: z
+      .string()
+      .optional()
+      .describe("AI model to use for image generation"),
+    width: z
+      .number()
+      .optional()
+      .describe("Width of the generated image in pixels"),
+    height: z
+      .number()
+      .optional()
+      .describe("Height of the generated image in pixels"),
+    numImages: z.number().optional().describe("Number of images to generate"),
+    quality: z
+      .enum(["standard", "hd"])
+      .optional()
+      .describe("Quality level of the generated images"),
+    style: z
+      .string()
+      .optional()
+      .describe("Style parameter to influence the image aesthetics"),
+    negativePrompt: z
+      .string()
+      .optional()
+      .describe("Text description of elements to avoid in the image"),
   },
   async ({
     prompt,
@@ -1880,15 +2292,34 @@ server.tool(
 // Tool to generate images (alternative API)
 server.tool(
   "generate-image",
+  "Generate images using various AI providers including DALL-E, Stable Diffusion, and Midjourney. Offers multiple provider options with consistent parameter interface.",
   {
-    prompt: z.string(),
-    provider: z.enum(["dalle", "stable-diffusion", "midjourney"]).optional(),
-    width: z.number().optional(),
-    height: z.number().optional(),
-    numImages: z.number().optional(),
-    quality: z.enum(["standard", "hd"]).optional(),
-    style: z.string().optional(),
-    negativePrompt: z.string().optional(),
+    prompt: z.string().describe("Text description of the image to generate"),
+    provider: z
+      .enum(["dalle", "stable-diffusion", "midjourney"])
+      .optional()
+      .describe("AI provider to use for image generation"),
+    width: z
+      .number()
+      .optional()
+      .describe("Width of the generated image in pixels"),
+    height: z
+      .number()
+      .optional()
+      .describe("Height of the generated image in pixels"),
+    numImages: z.number().optional().describe("Number of images to generate"),
+    quality: z
+      .enum(["standard", "hd"])
+      .optional()
+      .describe("Quality level of the generated images"),
+    style: z
+      .string()
+      .optional()
+      .describe("Style parameter to influence the image aesthetics"),
+    negativePrompt: z
+      .string()
+      .optional()
+      .describe("Text description of elements to avoid in the image"),
   },
   async ({
     prompt,
@@ -1968,11 +2399,18 @@ server.tool(
 // Tool to execute JavaScript code
 server.tool(
   "run-js-code",
+  "Execute JavaScript code in a secure sandbox environment with optional NPM dependencies. Returns execution results, console output, and execution metrics.",
   {
-    code: z.string(),
-    dependencies: z.record(z.string()).optional(),
-    timeout: z.number().optional(),
-    memory: z.number().optional(),
+    code: z.string().describe("JavaScript code to execute"),
+    dependencies: z
+      .record(z.string())
+      .optional()
+      .describe("NPM dependencies as object with name-version pairs"),
+    timeout: z
+      .number()
+      .optional()
+      .describe("Maximum execution time in milliseconds"),
+    memory: z.number().optional().describe("Maximum memory allocation in MB"),
   },
   async ({ code, dependencies, timeout, memory }) => {
     // Get API key from environment variable
@@ -2032,12 +2470,22 @@ server.tool(
 // Tool to execute Python code
 server.tool(
   "run-python-code",
+  "Execute Python code in a secure sandbox environment with optional package dependencies. Supports standard libraries and popular data science packages.",
   {
-    code: z.string(),
-    dependencies: z.array(z.string()).optional(),
-    timeout: z.number().optional(),
-    memory: z.number().optional(),
-    saveOutputFiles: z.boolean().optional(),
+    code: z.string().describe("Python code to execute"),
+    dependencies: z
+      .array(z.string())
+      .optional()
+      .describe("Python package dependencies as array of package names"),
+    timeout: z
+      .number()
+      .optional()
+      .describe("Maximum execution time in milliseconds"),
+    memory: z.number().optional().describe("Maximum memory allocation in MB"),
+    saveOutputFiles: z
+      .boolean()
+      .optional()
+      .describe("Whether to save and return files generated during execution"),
   },
   async ({ code, dependencies, timeout, memory, saveOutputFiles }) => {
     // Get API key from environment variable
