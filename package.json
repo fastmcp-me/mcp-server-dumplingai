@@ -37,10 +37,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dumplingai/mcp-server-dumplingai.git"
+    "url": "https://github.com/dumpling-ai/mcp-server-dumplingai.git"
   },
   "bugs": {
-    "url": "https://github.com/dumplingai/mcp-server-dumplingai/issues"
+    "url": "https://github.com/dumpling-ai/mcp-server-dumplingai/issues"
   },
   "homepage": "https://github.com/dumplingai/mcp-server-dumplingai#readme"
 }
