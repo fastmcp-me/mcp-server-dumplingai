@@ -1,7 +1,10 @@
+#!/usr/bin/env node
+
 /**
  * MCP Server for Dumpling AI
  *
  * Changes:
+ * - Added shebang line to make the file executable as a CLI command
  * - Added get-youtube-transcript tool to fetch transcripts from YouTube videos using the Dumpling AI API
  * - Added search tool to perform Google web searches and optionally scrape content from results
  * - Added get-autocomplete tool to get Google search autocomplete suggestions based on a query

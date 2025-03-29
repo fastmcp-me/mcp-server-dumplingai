@@ -25,12 +25,34 @@ Before you begin, ensure you have:
 - [Node.js](https://nodejs.org/) (v18 or higher)
 - An [Dumpling AI API key](https://app.dumplingai.com)
 
-## Installation 🛠️
+## Installation & Usage 🛠️
+
+### Using with npx (No Installation)
+
+You can run the server directly without installation using npx:
+
+```bash
+npx -y mcp-server-dumplingai
+```
+
+Make sure to set your API key as an environment variable:
+
+```bash
+DUMPLING_API_KEY=your-api-key-here npx -y mcp-server-dumplingai
+```
 
 ### NPM Installation
 
+If you prefer to install globally:
+
 ```bash
 npm install -g mcp-server-dumplingai
+```
+
+Then run it with:
+
+```bash
+DUMPLING_API_KEY=your-api-key-here mcp-server-dumplingai
 ```
 
 ### Manual Installation
@@ -52,6 +74,12 @@ npm install
 
 ```bash
 npm run build
+```
+
+4. Run the server:
+
+```bash
+DUMPLING_API_KEY=your-api-key-here node build/index.js
 ```
 
 ## Configuration ⚙️
@@ -79,7 +107,7 @@ code %APPDATA%\Claude\claude_desktop_config.json
   "mcpServers": {
     "dumplingai": {
       "command": "npx",
-      "args": ["mcp-server-dumplingai"],
+      "args": ["-y", "mcp-server-dumplingai"],
       "env": {
         "DUMPLING_API_KEY": "your-api-key-here"
       }
@@ -111,13 +139,14 @@ What are the most popular places to visit in New York according to Google Maps?
 ### Common Issues
 
 1. **API Key Issues**
-   * Confirm your DUMPLING_API_KEY is valid
-   * Check the DUMPLING_API_KEY is correctly set in your configuration
-   * Verify there are no spaces or quotes around the API key
+
+   - Confirm your DUMPLING_API_KEY is valid
+   - Check the DUMPLING_API_KEY is correctly set in your configuration
+   - Verify there are no spaces or quotes around the API key
 
 2. **Connection Issues**
-   * Restart Claude Desktop completely
-   * Check Claude Desktop logs
+   - Restart Claude Desktop completely
+   - Check Claude Desktop logs
 
 ## License
 
