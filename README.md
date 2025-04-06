@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server implementation that integrates with Dumpling AI for data scraping, content processing, knowledge management, AI agents, and code execution capabilities.
 
+[![smithery badge](https://smithery.ai/badge/@Dumpling-AI/mcp-server-dumplingai)](https://smithery.ai/server/@Dumpling-AI/mcp-server-dumplingai)
+
 ## Features
 
 - Complete integration with all Dumpling AI API endpoints
@@ -14,6 +16,14 @@ A Model Context Protocol (MCP) server implementation that integrates with Dumpli
 - Automatic error handling and detailed response formatting
 
 ## Installation
+
+### Installing via Smithery
+
+To install mcp-server-dumplingai for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@Dumpling-AI/mcp-server-dumplingai):
+
+```bash
+npx -y @smithery/cli install @Dumpling-AI/mcp-server-dumplingai --client claude
+```
 
 ### Running with npx
 

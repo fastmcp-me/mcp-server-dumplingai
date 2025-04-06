@@ -1,0 +1,25 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required:
+      - dumplingApiKey
+    properties:
+      dumplingApiKey:
+        type: string
+        description: Your Dumpling AI API key for authentication.
+    description: Configuration for the Dumpling AI MCP server. Provide your Dumpling
+      API key.
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['build/index.js'],
+      env: { DUMPLING_API_KEY: config.dumplingApiKey }
+    })
+  exampleConfig:
+    dumplingApiKey: example-dumpling-api-key
