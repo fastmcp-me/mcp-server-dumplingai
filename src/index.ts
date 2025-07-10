@@ -26,12 +26,10 @@ server.tool(
     timestampsToCombine: z
       .number()
       .optional()
-      .default(5)
       .describe("Number of timestamps to combine"),
     preferredLanguage: z
       .string()
       .optional()
-      .default("en")
       .describe("Preferred language code"),
   },
   async ({
